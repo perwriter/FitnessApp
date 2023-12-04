@@ -1,13 +1,43 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+// import { exerciseOptions, fetchData } from "../utils/fetchdata";
+import { exerciseOptions, fetchData } from "../utils/fetchdata";
+import HorizontalScrollbar from "./HorizontalScrollbar";
 
-const Searchexercises = () => {
-  const [search, setSearch] = useState(""); // Corrected useState syntax
+const SearchExercises = ({ setBodyPart, setExercises, bodyPart }) => {
+  const [search, setSearch] = useState("");
 
-  // Define your handleSearch function here if needed
+  const [bodyParts, setBodyParts] = useState([]);
+  useEffect(() => {
+    const fetchExerciseData = async () => {
+      const bodyPartsData = await fetchData(
+        "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
+        exerciseOptions
+      );
+      setBodyParts(["all", ...bodyPartsData]);
+    };
+  }, []);
   const handleSearch = async () => {
-    // Your search logic goes here
-    console.log("Searching for:", search);
+    try {
+      if (search) {
+        const exercisesData = await fetchData(
+          "https://exercisedb.p.rapidapi.com/exercises/bodyPart/back",
+          exerciseOptions
+        );
+        const searchedExercises = exercisesData.filter(
+          (exercise) =>
+            exercise.name.toLowerCase().includes(search) ||
+            exercise.target.toLowerCase().includes(search) ||
+            exercise.equipment.toLowerCase().includes(search) ||
+            exercise.bodyPart.toLowerCase().includes(search)
+        );
+        setSearch("");
+        setExercises(searchedExercises);
+        console.log(searchedExercises);
+      }
+    } catch (error) {
+      console.error("Error fetching exercises:", error);
+    }
   };
 
   return (
@@ -43,13 +73,21 @@ const Searchexercises = () => {
             right: "0px",
             fontSize: { lg: "20px", xs: "14px" },
           }}
-          onClick={handleSearch} // Call your handleSearch function on button click
+          onClick={handleSearch}
         >
           Search
         </Button>
+      </Box>
+      <Box sx={{ position: "relative", width: "100%", p: "20px" }}>
+        <HorizontalScrollbar
+          data={bodyParts}
+          bodyParts
+          //   setBodyPart={setBodyPart}
+          //   bodyPart={bodyPart}
+        />
       </Box>
     </Stack>
   );
 };
 
-export default Searchexercises;
+export default SearchExercises;
