@@ -7,7 +7,7 @@ export const fetchData = async (url, options) => {
 export const exerciseOptions = {
   method: "GET",
   headers: {
-    "X-RapidAPI-Key": "4ae836e6e2msh70791e6394c6f16p16d651jsn43506293c5bb",
+    "X-RapidAPI-Key": prcess.env.REACT_APP_RAPID_API_KEY,
     "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
   },
 };
